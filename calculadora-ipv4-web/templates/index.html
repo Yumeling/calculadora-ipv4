@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Calculadora web de direccionamiento IPv4, máscaras y prefijos CIDR.">
+  <title>Calculadora IPv4 | Redes de Datos I</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Inicio de Calculadora IPv4">
+        <span class="brand-mark" aria-hidden="true">IP</span>
+        <span>REDES <span class="brand-light">/ IPv4</span></span>
+      </a>
+      <span class="course-label">REDES DE DATOS I · 2026-II</span>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status-dot"></span> HERRAMIENTA DE DIRECCIONAMIENTO</div>
+          <h1>Calculadora <span>IPv4</span></h1>
+          <p>Calcula subredes, interpreta máscaras y consulta la clasificación de una dirección IPv4 en un solo lugar.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div>
+          <div class="art-orbit orbit-two"></div>
+          <div class="art-core">⌁</div>
+          <span class="art-tag tag-top">192.168.1.0</span>
+          <span class="art-tag tag-bottom">/24 · CIDR</span>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Calculadora de direccionamiento IPv4">
+        <div class="input-panel panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-label">PASO 01</span>
+              <h2>Ingresa los datos</h2>
+            </div>
+            <span class="heading-icon" aria-hidden="true">⌗</span>
+          </div>
+
+          <div class="mode-tabs" role="tablist" aria-label="Formato de entrada">
+            <button class="mode-tab active" id="tab-cidr" type="button" role="tab" aria-selected="true" aria-controls="form-cidr" data-mode="cidr">Dirección CIDR</button>
+            <button class="mode-tab" id="tab-mask" type="button" role="tab" aria-selected="false" aria-controls="form-mask" data-mode="mask">IP + máscara</button>
+          </div>
+
+          <form id="form-cidr" class="entry-form" role="tabpanel" aria-labelledby="tab-cidr" novalidate>
+            <label for="cidr-input">Dirección IPv4 con prefijo</label>
+            <div class="field-wrap">
+              <span class="field-symbol" aria-hidden="true">⌘</span>
+              <input id="cidr-input" name="cidr" type="text" inputmode="decimal" autocomplete="off" placeholder="192.168.10.25/27" value="192.168.1.100/24" required>
+            </div>
+            <p class="field-hint">Formato: cuatro octetos seguidos de / y un prefijo entre 0 y 32.</p>
+            <button class="calculate-button" type="submit">Calcular direccionamiento <span aria-hidden="true">→</span></button>
+          </form>
+
+          <form id="form-mask" class="entry-form hidden" role="tabpanel" aria-labelledby="tab-mask" novalidate>
+            <label for="ip-input">Dirección IPv4</label>
+            <div class="field-wrap">
+              <span class="field-symbol" aria-hidden="true">⌘</span>
+              <input id="ip-input" name="ip" type="text" inputmode="decimal" autocomplete="off" placeholder="192.168.10.25" required>
+            </div>
+            <label for="mask-input" class="second-label">Máscara decimal</label>
+            <div class="field-wrap">
+              <span class="field-symbol" aria-hidden="true">▦</span>
+              <input id="mask-input" name="mask" type="text" inputmode="decimal" autocomplete="off" placeholder="255.255.255.224" required>
+            </div>
+            <p class="field-hint">La máscara debe ser contigua; por ejemplo, 255.255.255.0.</p>
+            <button class="calculate-button" type="submit">Calcular direccionamiento <span aria-hidden="true">→</span></button>
+          </form>
+
+          <div class="error-message hidden" id="error-message" role="alert"></div>
+          <div class="input-footnote"><span aria-hidden="true">ⓘ</span> También se validan prefijos y rangos especiales definidos para IPv4.</div>
+        </div>
+
+        <div class="results-panel panel" id="results-panel" aria-live="polite" aria-busy="false">
+          <div class="panel-heading result-heading">
+            <div>
+              <span class="step-label">PASO 02</span>
+              <h2>Resultados del cálculo</h2>
+            </div>
+            <span class="result-status" id="result-status"><span class="status-dot"></span> LISTO</span>
+          </div>
+
+          <div id="empty-state" class="empty-state">
+            <div class="empty-icon" aria-hidden="true">⌁</div>
+            <h3>Tu resultado aparecerá aquí</h3>
+            <p>Ingresa una dirección IPv4 y calcula para ver la información de su red.</p>
+          </div>
+
+          <div id="results-content" class="hidden">
+            <div class="address-summary">
+              <div>
+                <span class="mini-label">DIRECCIÓN ANALIZADA</span>
+                <strong id="result-address">192.168.1.100</strong>
+              </div>
+              <span id="result-prefix" class="prefix-pill">/24</span>
+            </div>
+
+            <div class="classification-row">
+              <div class="classification-card">
+                <span class="mini-label">CLASE TRADICIONAL</span>
+                <strong id="result-class">C</strong>
+              </div>
+              <div class="classification-card usage-card">
+                <span class="mini-label">CLASIFICACIÓN DE USO</span>
+                <strong id="result-category">Privada (RFC 1918)</strong>
+                <small id="result-detail"></small>
+              </div>
+            </div>
+
+            <div class="section-divider"><span>INFORMACIÓN DE LA SUBRED</span></div>
+            <div class="data-grid">
+              <div class="data-item"><span>Dirección de red</span><strong id="result-network">—</strong></div>
+              <div class="data-item"><span>Broadcast dirigido</span><strong id="result-broadcast">—</strong></div>
+              <div class="data-item"><span>Máscara decimal</span><strong id="result-mask">—</strong></div>
+              <div class="data-item"><span>Máscara wildcard</span><strong id="result-wildcard">—</strong></div>
+              <div class="data-item"><span>Total de direcciones</span><strong id="result-total">—</strong></div>
+              <div class="data-item"><span>Hosts utilizables</span><strong id="result-usable">—</strong></div>
+              <div class="data-item"><span>Primer host utilizable</span><strong id="result-first">—</strong></div>
+              <div class="data-item"><span>Último host utilizable</span><strong id="result-last">—</strong></div>
+            </div>
+
+            <div id="notes-box" class="notes-box hidden">
+              <div class="notes-title"><span aria-hidden="true">✦</span> Consideraciones</div>
+              <ul id="notes-list"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="quick-reference">
+        <div class="reference-heading">
+          <div><span class="step-label">GUÍA RÁPIDA</span><h2>¿Qué puedes consultar?</h2></div>
+          <p>La calculadora contempla las reglas generales y los casos especiales de la actividad.</p>
+        </div>
+        <div class="reference-grid">
+          <article class="reference-card"><span class="reference-number">01</span><h3>Subredes y hosts</h3><p>Red, broadcast dirigido, cantidad total de direcciones y rango de hosts.</p></article>
+          <article class="reference-card"><span class="reference-number">02</span><h3>Máscaras y CIDR</h3><p>Equivalencia entre prefijos CIDR y máscaras decimales contiguas.</p></article>
+          <article class="reference-card"><span class="reference-number">03</span><h3>Casos especiales</h3><p>Soporte para /31, /32, multicast, clase E, loopback y link-local.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>CALCULADORA IPv4</span><span>Herramienta académica · Redes de Datos I</span></footer>
+  </div>
+</body>
+</html>

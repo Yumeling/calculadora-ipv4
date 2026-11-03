@@ -1,0 +1,16 @@
+[Unit]
+Description=Calculadora web de direccionamiento IPv4 (Flask/Gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=ipv4calc
+Group=ipv4calc
+WorkingDirectory=/opt/calculadora-ipv4-web
+Environment="PATH=/opt/calculadora-ipv4-web/.venv/bin"
+ExecStart=/opt/calculadora-ipv4-web/.venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 --access-logfile - --error-logfile - app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
